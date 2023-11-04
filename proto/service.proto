@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "proto";
+
+package proto;
+
+service Counter {
+  rpc Count (CountRequest) returns (CountReply) {}
+}
+
+message CountRequest {
+  string message = 1;
+}
+
+message CountReply {
+  int32 messageSize = 1;
+}
