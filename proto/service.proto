@@ -4,14 +4,24 @@ option go_package = "proto";
 
 package proto;
 
-service Counter {
-  rpc Count (CountRequest) returns (CountReply) {}
+service PersonWrite {
+  rpc NewPerson (Person) returns (Empty) {}
 }
 
-message CountRequest {
-  string message = 1;
+service PersonRead {
+  rpc GetPerson (PersonId) returns (Person) {}
 }
 
-message CountReply {
-  int32 messageSize = 1;
+message Empty {
+
+}
+
+message PersonId {
+  string id = 1;
+}
+
+message Person {
+  PersonId id = 1;
+  string name = 2;
+  string surname = 3;
 }

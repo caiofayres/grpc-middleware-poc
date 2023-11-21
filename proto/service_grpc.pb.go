@@ -14,86 +14,172 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// CounterClient is the client API for Counter service.
+// PersonWriteClient is the client API for PersonWrite service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type CounterClient interface {
-	Count(ctx context.Context, in *CountRequest, opts ...grpc.CallOption) (*CountReply, error)
+type PersonWriteClient interface {
+	NewPerson(ctx context.Context, in *Person, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type counterClient struct {
+type personWriteClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewCounterClient(cc grpc.ClientConnInterface) CounterClient {
-	return &counterClient{cc}
+func NewPersonWriteClient(cc grpc.ClientConnInterface) PersonWriteClient {
+	return &personWriteClient{cc}
 }
 
-func (c *counterClient) Count(ctx context.Context, in *CountRequest, opts ...grpc.CallOption) (*CountReply, error) {
-	out := new(CountReply)
-	err := c.cc.Invoke(ctx, "/proto.Counter/Count", in, out, opts...)
+func (c *personWriteClient) NewPerson(ctx context.Context, in *Person, opts ...grpc.CallOption) (*Empty, error) {
+	out := new(Empty)
+	err := c.cc.Invoke(ctx, "/proto.PersonWrite/NewPerson", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// CounterServer is the server API for Counter service.
-// All implementations must embed UnimplementedCounterServer
+// PersonWriteServer is the server API for PersonWrite service.
+// All implementations must embed UnimplementedPersonWriteServer
 // for forward compatibility
-type CounterServer interface {
-	Count(context.Context, *CountRequest) (*CountReply, error)
-	mustEmbedUnimplementedCounterServer()
+type PersonWriteServer interface {
+	NewPerson(context.Context, *Person) (*Empty, error)
+	mustEmbedUnimplementedPersonWriteServer()
 }
 
-// UnimplementedCounterServer must be embedded to have forward compatible implementations.
-type UnimplementedCounterServer struct {
+// UnimplementedPersonWriteServer must be embedded to have forward compatible implementations.
+type UnimplementedPersonWriteServer struct {
 }
 
-func (UnimplementedCounterServer) Count(context.Context, *CountRequest) (*CountReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Count not implemented")
+func (UnimplementedPersonWriteServer) NewPerson(context.Context, *Person) (*Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method NewPerson not implemented")
 }
-func (UnimplementedCounterServer) mustEmbedUnimplementedCounterServer() {}
+func (UnimplementedPersonWriteServer) mustEmbedUnimplementedPersonWriteServer() {}
 
-// UnsafeCounterServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to CounterServer will
+// UnsafePersonWriteServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PersonWriteServer will
 // result in compilation errors.
-type UnsafeCounterServer interface {
-	mustEmbedUnimplementedCounterServer()
+type UnsafePersonWriteServer interface {
+	mustEmbedUnimplementedPersonWriteServer()
 }
 
-func RegisterCounterServer(s grpc.ServiceRegistrar, srv CounterServer) {
-	s.RegisterService(&Counter_ServiceDesc, srv)
+func RegisterPersonWriteServer(s grpc.ServiceRegistrar, srv PersonWriteServer) {
+	s.RegisterService(&PersonWrite_ServiceDesc, srv)
 }
 
-func _Counter_Count_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CountRequest)
+func _PersonWrite_NewPerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Person)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CounterServer).Count(ctx, in)
+		return srv.(PersonWriteServer).NewPerson(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.Counter/Count",
+		FullMethod: "/proto.PersonWrite/NewPerson",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CounterServer).Count(ctx, req.(*CountRequest))
+		return srv.(PersonWriteServer).NewPerson(ctx, req.(*Person))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Counter_ServiceDesc is the grpc.ServiceDesc for Counter service.
+// PersonWrite_ServiceDesc is the grpc.ServiceDesc for PersonWrite service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Counter_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Counter",
-	HandlerType: (*CounterServer)(nil),
+var PersonWrite_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.PersonWrite",
+	HandlerType: (*PersonWriteServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Count",
-			Handler:    _Counter_Count_Handler,
+			MethodName: "NewPerson",
+			Handler:    _PersonWrite_NewPerson_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "proto/service.proto",
+}
+
+// PersonReadClient is the client API for PersonRead service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PersonReadClient interface {
+	GetPerson(ctx context.Context, in *PersonId, opts ...grpc.CallOption) (*Person, error)
+}
+
+type personReadClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPersonReadClient(cc grpc.ClientConnInterface) PersonReadClient {
+	return &personReadClient{cc}
+}
+
+func (c *personReadClient) GetPerson(ctx context.Context, in *PersonId, opts ...grpc.CallOption) (*Person, error) {
+	out := new(Person)
+	err := c.cc.Invoke(ctx, "/proto.PersonRead/GetPerson", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PersonReadServer is the server API for PersonRead service.
+// All implementations must embed UnimplementedPersonReadServer
+// for forward compatibility
+type PersonReadServer interface {
+	GetPerson(context.Context, *PersonId) (*Person, error)
+	mustEmbedUnimplementedPersonReadServer()
+}
+
+// UnimplementedPersonReadServer must be embedded to have forward compatible implementations.
+type UnimplementedPersonReadServer struct {
+}
+
+func (UnimplementedPersonReadServer) GetPerson(context.Context, *PersonId) (*Person, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetPerson not implemented")
+}
+func (UnimplementedPersonReadServer) mustEmbedUnimplementedPersonReadServer() {}
+
+// UnsafePersonReadServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PersonReadServer will
+// result in compilation errors.
+type UnsafePersonReadServer interface {
+	mustEmbedUnimplementedPersonReadServer()
+}
+
+func RegisterPersonReadServer(s grpc.ServiceRegistrar, srv PersonReadServer) {
+	s.RegisterService(&PersonRead_ServiceDesc, srv)
+}
+
+func _PersonRead_GetPerson_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PersonId)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PersonReadServer).GetPerson(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.PersonRead/GetPerson",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PersonReadServer).GetPerson(ctx, req.(*PersonId))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// PersonRead_ServiceDesc is the grpc.ServiceDesc for PersonRead service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var PersonRead_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.PersonRead",
+	HandlerType: (*PersonReadServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetPerson",
+			Handler:    _PersonRead_GetPerson_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
