@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"log"
 	"net"
@@ -16,18 +15,19 @@ import (
 
 type WriteServer struct {
 	CacheService cc.CacheService
-	DataService db.PersonDataService
+	DataService  db.PersonDataService
 	pb.UnimplementedPersonWriteServer
 }
 type ReadServer struct {
 	CacheService cc.CacheService
-	DataService db.PersonDataService
+	DataService  db.PersonDataService
 	pb.UnimplementedPersonReadServer
 }
+
 // service PersonWrite {
 // 	rpc NewPerson (Person) returns (Empty) {}
 //   }
-  
+
 //   service PersonRead {
 // 	rpc GetPerson (PersonId) returns (Person) {}
 //   }
@@ -44,8 +44,8 @@ func (s *ReadServer) GetPerson(ctx context.Context, in *pb.PersonId) (*pb.Person
 		return nil, err
 	}
 	return &pb.Person{
-		Id: &pb.PersonId{Id: p.Id},
-		Name: p.Name,
+		Id:      &pb.PersonId{Id: p.Id},
+		Name:    p.Name,
 		Surname: p.Surname,
 	}, nil
 }
@@ -101,13 +101,16 @@ func (s *ReadServer) CacheReadMiddleware(ctx context.Context, req any, info *grp
 }
 
 func StartServer() {
-	cs := cc.NewCacheService()
-	db := db.NewLocalPersonData()
+	connectedDb, err := db.ConnectToDatabase()
+	if err != nil {
+		panic(err)
+	}
 
+	cs := cc.NewCacheService()
+	db := db.NewPersonDatabase(connectedDb)
 
 	ws := WriteServer{CacheService: cs, DataService: db}
 	rs := ReadServer{CacheService: cs, DataService: db}
-	flag.Parse()
 	lis, err := net.Listen("tcp", ":30301")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -115,6 +118,10 @@ func StartServer() {
 
 	// rawServer := grpc.NewServer()
 	cacheInterceptor := grpc.NewServer(
+		grpc.UnaryInterceptor(rs.CacheReadMiddleware),
+	)
+
+	cacheReadIntercepetor := grpc.NewServer(
 		grpc.UnaryInterceptor(rs.CacheReadMiddleware),
 	)
 

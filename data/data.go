@@ -6,7 +6,7 @@ import (
 )
 
 type PersonDataService interface {
-	Upsert(Person)
+	Upsert(Person) error
 	Get(string) (*Person, error)
 	Delete(string) error
 }
@@ -16,15 +16,15 @@ type LocalPersonData struct {
 }
 
 type Person struct {
-	Id string
-	Name string
+	Id      string
+	Name    string
 	Surname string
 }
 
 func NewPerson(id, name, surname string) Person {
 	return Person{
-		Id: id,
-		Name: name,
+		Id:      id,
+		Name:    name,
 		Surname: surname,
 	}
 }
@@ -38,11 +38,12 @@ func NewLocalPersonData() PersonDataService {
 }
 
 // inserts or update data
-func (l *LocalPersonData)Upsert(p Person) {
+func (l *LocalPersonData) Upsert(p Person) error {
 	l.data.Store(p.Id, p)
+	return nil
 }
 
-func (l *LocalPersonData)Get(id string) (*Person, error) {
+func (l *LocalPersonData) Get(id string) (*Person, error) {
 	v, ok := l.data.Load(id)
 	if !ok {
 		return nil, ErrPersonNotFound
@@ -51,7 +52,7 @@ func (l *LocalPersonData)Get(id string) (*Person, error) {
 	return &p, nil
 }
 
-func (l *LocalPersonData)Delete(id string) error {
+func (l *LocalPersonData) Delete(id string) error {
 	_, loaded := l.data.LoadAndDelete(id)
 	if !loaded {
 		return ErrPersonNotFound
